@@ -12,7 +12,7 @@ let userSchema = new Schema({
       productName: {type: String},
       salePrice: {type: Number},
       productImage: {type: String},
-      checked: {type: String},
+      checked: {type: Boolean},
       productNum: {type: Number}
     }
   ],

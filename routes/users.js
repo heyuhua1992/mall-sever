@@ -14,7 +14,8 @@ router.post('/login', (req, res, next) => {
     if (err) {
       res.json({
         status: 1,
-        msg: err.message
+        msg: err.message,
+        result: ''
       })
     } else {
       if (!doc) {return}
@@ -38,7 +39,6 @@ router.post('/login', (req, res, next) => {
     }
   })
 })
-
 // 登出接口
 router.post('/logout', (req, res, next) => {
   res.cookie('userId', '', {
@@ -73,5 +73,108 @@ router.get('/checkLogin', (req, res, next) => {
       result: ''
     })
   }
+})
+// 查询当前用户购物车数据
+router.get('/cartList', (req, res, next) => {
+  let userId = req.cookies.userId
+  User.findOne({userId: userId})
+    .exec((err, doc) => {
+      if (err) {
+        res.json({
+          status: 1,
+          msg: err.message,
+          result: ''
+        })
+      } else {
+        if (!doc) { return }
+        res.json({
+          status: 0,
+          msg: '',
+          result: doc.cartList
+        })
+      }
+    })
+})
+// 购物车删除商品
+router.post('/cartDel', (req, res, next) => {
+  let userId = req.cookies.userId,
+      productId = req.body.productId
+  User.update({userId: userId}, {$pull: {cartList: {productId: productId}}})
+    .exec((err, doc) => {
+      if (err) {
+        res.json({
+          status: 1,
+          msg: err.message,
+          result: ''
+        })
+      } else {
+        if (!doc) { return }
+        res.json({
+          status: 0,
+          msg: '',
+          result: 'suc'
+        })
+      }
+    })
+})
+// 商品数量修改
+router.post('/cartEdit', (req, res, next) => {
+  let userId = req.cookies.userId,
+      productId = req.body.productId,
+      productNum = req.body.productNum,
+      checked = req.body.checked;
+  User.update({userId: userId, 'cartList.productId': productId}, {
+    'cartList.$.productNum': productNum,
+    'cartList.$.checked': checked
+  }).exec((err, doc) => {
+    if (err) {
+      res.json({
+        status: 1,
+        msg: err.message,
+        result: ''
+      })
+    } else {
+      if (!doc) { return }
+      res.json({
+        status: 0,
+        msg: '',
+        result: 'suc'
+      })
+    }
+  }) 
+})
+router.post('/editCheckAll', (req, res, next) => {
+  let userId = req.cookies.userId,
+      checkAll = req.body.checkAll;
+  User.findOne({userId: userId})
+    .exec((err, doc) => {
+      if (err) {
+        res.json({
+          status: 1,
+          msg: err.message,
+          result: ''
+        })
+      } else {
+        if (!doc) { return }
+        doc.cartList.forEach(item => {
+          item.checked = checkAll
+        })
+        doc.save((err1, doc1) => {
+          if (err1) {
+            res.json({
+              status: 1,
+              msg: err1.message,
+              result: ''
+            })
+          } else {
+            res.json({
+              status: 0,
+              msg: '',
+              result: 'suc'
+            })
+          }
+        })
+      }
+    })
 })
 module.exports = router;

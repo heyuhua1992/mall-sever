@@ -110,7 +110,7 @@ router.post("/addCart", (req, res, next) => {
             if (!goodsDoc) {return}
             goodsDoc = goodsDoc.toObject()
             goodsDoc.productNum = 1
-            goodsDoc.checked = 1
+            goodsDoc.checked = true
             userDoc.cartList.push(goodsDoc)
             userDoc.save((err3, doc3) => {
               if (err3) {
