@@ -5,7 +5,32 @@ let userSchema = new Schema({
   userId: {type: String},
   userName: {type: String},
   userPwd: {type: String},
-  orderList: {type: Array},
+  orderList: [
+    {
+      orderId: {type: String},
+      orderTotal: {type: Number},
+      addressInfo: {
+        addressId: {type: String},
+        userName: {type: String},
+        streetName: {type: String},
+        postCode: {type: Number},
+        tel: {type: Number},
+        isDefault: {type: Boolean}
+      },
+      goodsList: [
+        {
+          productId: {type: String},
+          productName: {type: String},
+          salePrice: {type: Number},
+          productImage: {type: String},
+          checked: {type: Boolean},
+          productNum: {type: Number}
+        }
+      ],
+      orderStatus: {type: Number},
+      createDate: {type: String}
+    }
+  ],
   cartList: [
     {
       productId: {type: String},
@@ -16,7 +41,16 @@ let userSchema = new Schema({
       productNum: {type: Number}
     }
   ],
-  addressList: {type: Array}
+  addressList: [
+    {
+      addressId: {type: String},
+      userName: {type: String},
+      streetName: {type: String},
+      postCode: {type: Number},
+      tel: {type: Number},
+      isDefault: {type: Boolean}
+    }
+  ]
 })
 
 module.exports = mongoose.model('User', userSchema)

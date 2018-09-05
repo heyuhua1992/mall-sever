@@ -22,10 +22,10 @@ mongoose.connect(url, {useNewUrlParser: true}, (err) => {
 // }, 5000)
 // 查询商品列表
 router.get('/list', (req, res, next) => {
-  let page = parseInt(req.param("page") || req.query.page) // 当前页码
-  let pageSize = parseInt(req.param("pageSize") || req.query.pageSize) //每页显示多少条
-  let priceLevel = req.param('priceLevel') || req.query.priceLevel || 'all'
-  let sort = req.param("sort") || req.query.sort // 升序降序
+  let page = parseInt(req.query.page) // 当前页码
+  let pageSize = parseInt(req.query.pageSize) //每页显示多少条
+  let priceLevel = req.query.priceLevel || 'all'
+  let sort = req.query.sort // 升序降序
   let skip = (page - 1 ) * pageSize //要跳过多少条
   let priceGt = -1, priceLte = -1
   let params ={} //搜索条件
@@ -108,7 +108,7 @@ router.post("/addCart", (req, res, next) => {
             })
           } else {
             if (!goodsDoc) {return}
-            goodsDoc = goodsDoc.toObject()
+            // goodsDoc = goodsDoc.toObject() // 如果数据库中没有goodsDoc.checked 则需要把doc转为obj，否则无法设置
             goodsDoc.productNum = 1
             goodsDoc.checked = true
             userDoc.cartList.push(goodsDoc)
