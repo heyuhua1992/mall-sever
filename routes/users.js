@@ -379,4 +379,31 @@ router.get('/orderDetail', (req, res, next) =>{
       }
     })
 })
+// 查询商品数量
+router.get('/getCartCount', (req, res, next) =>{
+  if (req.cookies && req.cookies.userId) {
+    let userId = req.cookies.userId
+    User.findOne({userId: userId})
+      .exec((err, doc) => {
+        if (err) {
+          res.json({
+            status: 1,
+            msg: err.message,
+            result: ''
+          })
+        } else {
+          let cartList = doc.cartList
+          let cartCount = 0
+          cartList.forEach(item => {
+            cartCount += parseInt(item.productNum)
+          })
+          res.json({
+            status: 0,
+            msg: '',
+            result: cartCount
+          })
+        }
+      })
+  }
+})
 module.exports = router;

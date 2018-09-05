@@ -26,7 +26,7 @@ app.use((req, res, next) => {
   } else {
     res.json({
       status: 10001,
-      msg: '当前未登录',
+      msg: 'filter,当前未登录',
       result: ''
     })
   }
