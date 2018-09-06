@@ -1,25 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose')
 const Goods = require('../models/goods')
 const User = require('../models/user')
 
-// var url = 'mongodb+srv://cluster-mall-wci8o.mongodb.net/mall'
-let url = 'mongodb://127.0.0.1:27017/mall'
-// 连接数据库 本地的db不需要{ useNewUrlParser: true }
-mongoose.connect(url, {useNewUrlParser: true}, (err) => {
-  if (err) {
-    console.log('连接失败')
-  } else {
-    console.log('连接成功')
-  }
-})
-// 断开连接
-// setTimeout(() => {
-//   mongoose.disconnect(() => {
-//     console.log('已断开连接')
-//   })
-// }, 5000)
 // 查询商品列表
 router.get('/list', (req, res, next) => {
   let page = parseInt(req.query.page) // 当前页码

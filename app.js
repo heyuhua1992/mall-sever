@@ -4,8 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var ejs = require('ejs');
-
 var app = express();
+// 连接数据库
+var connect = (require('./connect/connect'))()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,7 +32,7 @@ app.use((req, res, next) => {
     })
   }
 })
-
+// 一级入口
 app.use('/goods', require('./routes/goods'));
 app.use('/users',  require('./routes/users'));
 
