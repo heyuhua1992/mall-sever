@@ -15,7 +15,7 @@ router.post('/login', (req, res, next) => {
       res.json({
         status: 1,
         msg: err.message,
-        result: ''
+        result: '用户名或密码错误'
       })
     } else {
       if (!doc) {return}
@@ -51,7 +51,7 @@ router.post('/logout', (req, res, next) => {
   })
   res.json({
     status: 0,
-    msg: '',
+    msg: '您已经退出登录',
     result: ''
   })
 })
@@ -60,7 +60,7 @@ router.get('/checkLogin', (req, res, next) => {
   if (req.cookies.userId) {
     res.json({
       status: 0,
-      msg: '',
+      msg: '用户已登陆',
       result: {
         userName: req.cookies.userName,
         userId: req.cookies.userId
@@ -69,7 +69,7 @@ router.get('/checkLogin', (req, res, next) => {
   } else {
     res.json({
       status: 1,
-      msg: '未登录',
+      msg: '用户未登录',
       result: ''
     })
   }
@@ -89,7 +89,7 @@ router.get('/cartList', (req, res, next) => {
         if (!doc) { return }
         res.json({
           status: 0,
-          msg: '',
+          msg: '查询购物车数据成功',
           result: doc.cartList
         })
       }
@@ -111,8 +111,8 @@ router.post('/cartDel', (req, res, next) => {
         if (!doc) { return }
         res.json({
           status: 0,
-          msg: '',
-          result: 'suc'
+          msg: '该商品已删除',
+          result: ''
         })
       }
     })
@@ -137,8 +137,8 @@ router.post('/cartEdit', (req, res, next) => {
       if (!doc) { return }
       res.json({
         status: 0,
-        msg: '',
-        result: 'suc'
+        msg: '修改成功',
+        result: ''
       })
     }
   }) 
@@ -170,8 +170,8 @@ router.post('/editCheckAll', (req, res, next) => {
           } else {
             res.json({
               status: 0,
-              msg: '',
-              result: 'suc'
+              msg: '操作成功',
+              result: ''
             })
           }
         })
@@ -192,7 +192,7 @@ router.post('/addressList', (req, res, next) => {
       } else {
         res.json({
           status: 0,
-          msg: '',
+          msg: '操作成功',
           result: doc.addressList
         })
       }
@@ -205,7 +205,7 @@ router.post('/setDefault', (req, res, next) => {
   if (!addressId) {
     res.json({
       status: 1003,
-      msg: '没有输入addressId',
+      msg: '缺少地址ID',
       result: ''
     })
   } else {
@@ -236,7 +236,7 @@ router.post('/setDefault', (req, res, next) => {
             } else {
               res.json({
                 status: 0,
-                msg: '',
+                msg: '操作成功',
                 result: ''
               })
             }
@@ -260,7 +260,7 @@ router.post('/delAddress', (req, res, next) => {
       } else {
         res.json({
           status: 0,
-          msg: '',
+          msg: '操作成功',
           result: ''
         })
       }
@@ -321,7 +321,7 @@ router.post('/payMent', (req, res, next) => {
           } else {
             res.json({
               status: 0,
-              msg: '',
+              msg: '操作成功',
               result: {
                 orderId: order.orderId,
                 orderTotal: order.orderTotal
@@ -356,7 +356,7 @@ router.get('/orderDetail', (req, res, next) =>{
           if (orderTotal > 0) {
             res.json({
               status: 0,
-              msg: '',
+              msg: '操作成功',
               result: {
                 orderId: orderId,
                 orderTotal: orderTotal
@@ -399,11 +399,11 @@ router.get('/getCartCount', (req, res, next) =>{
           })
           res.json({
             status: 0,
-            msg: '',
+            msg: '操作成功',
             result: cartCount
           })
         }
       })
   }
 })
-module.exports = router;
+module.exports = router

@@ -49,12 +49,13 @@ router.get('/list', (req, res, next) => {
     if (err) {
       res.json({
         status: 1,
-        msg: err.message
+        msg: err.message,
+        result: ''
       })
     } else {
       res.json({
         status: 0,
-        msg: '',
+        msg: '操作成功',
         result: {
           count: doc.length,
           list: doc
@@ -65,14 +66,15 @@ router.get('/list', (req, res, next) => {
 })
 // 加入购物车
 router.post("/addCart", (req, res, next) => {
-  let userId = '100000077', 
+  let userId = req.cookies.userId, 
       productId = req.body.productId
 
   User.findOne({userId: userId}, (userErr, userDoc) => {
     if (userErr) {
       res.json({
         status: 1,
-        msg: userErr.message
+        msg: userErr.message,
+        result: ''
       })
     } else {
       if(!userDoc) {return}
@@ -89,13 +91,14 @@ router.post("/addCart", (req, res, next) => {
           if (err4) {
             res.json({
               status: 1,
-              msg: err4.message
+              msg: err4.message,
+              result: ''
             })
           } else {
             res.json({
               status: 0,
-              msg: '数量更改成功',
-              result: 'success'
+              msg: '操作成功',
+              result: ''
             })
           }
         })
@@ -104,7 +107,8 @@ router.post("/addCart", (req, res, next) => {
           if (goodsErr) {
             res.json({
               status: 1,
-              msg: goodsErr.message
+              msg: goodsErr.message,
+              result: ''
             })
           } else {
             if (!goodsDoc) {return}
@@ -116,13 +120,14 @@ router.post("/addCart", (req, res, next) => {
               if (err3) {
                 res.json({
                   status: 1,
-                  msg: err3.message
+                  msg: err3.message,
+                  result: ''
                 })
               } else {
                 res.json({
                   status: 0,
-                  msg: '加入购物车成功',
-                  result: 'success'
+                  msg: '已加入购物车',
+                  result: ''
                 })
               }
             })
