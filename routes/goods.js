@@ -7,27 +7,39 @@ const User = require('../models/user')
 router.get('/list', (req, res, next) => {
   let page = parseInt(req.query.page) // 当前页码
   let pageSize = parseInt(req.query.pageSize) //每页显示多少条
-  let priceLevel = req.query.priceLevel || 'all'
+  let priceRange = JSON.parse(req.query.priceRange)
   let sort = req.query.sort // 升序降序
   let skip = (page - 1 ) * pageSize //要跳过多少条
-  let priceGt = -1, priceLte = -1
-  let params ={} //搜索条件
-  if (priceLevel != 'all') {
-    switch (priceLevel) {
-      case '0': priceGt = 0; priceLte = 500;break;
-      case '1': priceGt = 500; priceLte = 1000;break;
-      case '2': priceGt = 1000; priceLte = 2000;break;
-      case '3': priceGt = 2000; priceLte = 9999;break;
-    }
-    params = {
-      salePrice: {
-        $gt: priceGt,
-        $lte: priceLte
-      }
-    }
+  let priceGte = priceRange.startPrice - 0
+  let priceLte = priceRange.endPrice - 0
+  let salePrice = {};
+  console.log(priceRange, priceGte, priceLte)
+  // 如果两个都不是数字
+  if (isNaN(priceGte) && isNaN(priceLte)) {
+    salePrice.$gte = 0
+    // 如果最小值不是数值,最大值是数值
+  } else if (isNaN(priceGte) && !isNaN(priceLte)) {
+    salePrice.$lte = priceLte
+    // 如果最大值不是数值,最小值是数值
+  } else if (!isNaN(priceGte) && isNaN(priceLte)) {
+    salePrice.$gte = priceGte
+    // 两个都是数值,且都为0
+  } else if (priceGte == 0 && priceLte == 0) {
+    salePrice.$gte = 0
+    // 输入的最大值小于最小值，且最大值不为0
+  } else if (priceGte > priceLte && priceLte != 0) {
+    salePrice.$gte = 0
+    salePrice.$lte = priceLte
+    // 输入的最大值小于最小值，且最大值为0
+  } else if (priceGte > priceLte && priceLte == 0) {
+    salePrice.$gte = priceGte
+  } else {
+    salePrice.$gte = priceGte
+    salePrice.$lte = priceLte
   }
+  console.log(salePrice, priceGte, priceLte)
   // 通过find查找导数据，通过skip跳过多少条，通过limit显示的数目
-  var goodsModel = Goods.find(params).sort({'salePrice':sort}).skip(skip).limit(pageSize)
+  var goodsModel = Goods.find({salePrice: salePrice}).sort({'salePrice':sort}).skip(skip).limit(pageSize)
   goodsModel.exec((err, doc) => {
     if (err) {
       res.json({
