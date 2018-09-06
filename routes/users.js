@@ -266,7 +266,7 @@ router.post('/delAddress', (req, res, next) => {
       }
     })
 })
-// 付款
+// 付款，生成订单
 router.post('/payMent', (req, res, next) => {
   let userId = req.cookies.userId
   let addressId = req.body.addressId
@@ -283,18 +283,20 @@ router.post('/payMent', (req, res, next) => {
       } else {
         let address = {}
         let goodsList = []
-        
+        let newCartList = []
         // 获取当前订单的地址
         doc.addressList.forEach(item => {
           if (item.addressId === addressId) {
             address = item
           }
         })
-        // 获取用户购物车商品
-        doc.cartList.forEach(item => {
+        // 获取用户购物车商品,删除购物车已购买的商品
+        newCartList = doc.cartList.filter(item => {
           if (item.checked) {
             goodsList.push(item)
+            return false
           }
+          return item
         })
         let prefix = 622
         let r1 = Math.floor(Math.random() * 10)
@@ -307,10 +309,12 @@ router.post('/payMent', (req, res, next) => {
           orderTotal: orderTotal,
           addressInfo: address,
           goodsList: goodsList,
-          orderStatus: 1,
+          orderStatus: 1, // 为1时未付款
           createDate: createDate
         }
         doc.orderList.push(order)
+        // 替换购物车列表
+        doc.cartList = newCartList
         doc.save((err1, doc1) => {
           if (err1) {
             res.json({
