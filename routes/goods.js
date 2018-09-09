@@ -13,7 +13,6 @@ router.get('/list', (req, res, next) => {
   let priceGte = priceRange.startPrice - 0
   let priceLte = priceRange.endPrice - 0
   let salePrice = {};
-  console.log(priceRange, priceGte, priceLte)
   // 如果两个都不是数字
   if (isNaN(priceGte) && isNaN(priceLte)) {
     salePrice.$gte = 0
@@ -37,7 +36,6 @@ router.get('/list', (req, res, next) => {
     salePrice.$gte = priceGte
     salePrice.$lte = priceLte
   }
-  console.log(salePrice, priceGte, priceLte)
   // 通过find查找导数据，通过skip跳过多少条，通过limit显示的数目
   var goodsModel = Goods.find({salePrice: salePrice}).sort({'salePrice':sort}).skip(skip).limit(pageSize)
   goodsModel.exec((err, doc) => {

@@ -26,10 +26,12 @@ app.use((req, res, next) => {
     next()
   } else {
     res.json({
-      status: 10001,
+      status: 10401,
       msg: 'filter,当前未登录',
       result: ''
     })
+    // 401 用户需要验证
+    next(createError(401))
   }
 })
 // 一级入口
