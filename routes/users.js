@@ -86,12 +86,19 @@ router.get('/cartList', (req, res, next) => {
           result: ''
         })
       } else {
-        if (!doc) { return }
-        res.json({
-          status: 0,
-          msg: '查询购物车数据成功',
-          result: doc.cartList
-        })
+        if (!doc) { 
+          res.json({
+            status: 1,
+            msg: '购物车没有商品',
+            result: ''
+          })
+        } else {
+          res.json({
+            status: 0,
+            msg: '查询购物车数据成功',
+            result: doc.cartList
+          })
+        }
       }
     })
 })
@@ -270,69 +277,98 @@ router.post('/delAddress', (req, res, next) => {
 router.post('/payMent', (req, res, next) => {
   let userId = req.cookies.userId
   let addressId = req.body.addressId
-  // orderTotal 不该这样
-  let orderTotal = req.body.orderTotal
+  let orderTotal = 0
+  // 获取用户购物车列表
   User.findOne({userId: userId})
-    .exec((err, doc) => {
-      if (err) {
+    .exec((_err, _doc) => {
+      if (_err) {
         res.json({
           status: 1,
           msg: err.message,
           result: ''
         })
       } else {
-        let address = {}
-        let goodsList = []
-        let newCartList = []
-        // 获取当前订单的地址
-        doc.addressList.forEach(item => {
-          if (item.addressId === addressId) {
-            address = item
-          }
-        })
-        // 获取用户购物车商品,删除购物车已购买的商品
-        newCartList = doc.cartList.filter(item => {
-          if (item.checked) {
-            goodsList.push(item)
-            return false
-          }
-          return item
-        })
-        let prefix = 622
-        let r1 = Math.floor(Math.random() * 10)
-        let r2 = Math.floor(Math.random() * 10)
-        let sysDate = new Date().Format('yyyyMMddhhmmss')
-        let createDate = new Date().Format('yyyy-MM-dd hh:mm:ss')
-        let orderId = prefix + r1 + sysDate + r2 + ''
-        let order = {
-          orderId: orderId,
-          orderTotal: orderTotal,
-          addressInfo: address,
-          goodsList: goodsList,
-          orderStatus: 1, // 为1时未付款
-          createDate: createDate
-        }
-        doc.orderList.push(order)
-        // 替换购物车列表
-        doc.cartList = newCartList
-        doc.save((err1, doc1) => {
-          if (err1) {
-            res.json({
-              status: 1,
-              msg: err1.message,
-              result: ''
-            })
-          } else {
-            res.json({
-              status: 0,
-              msg: '操作成功',
-              result: {
-                orderId: order.orderId,
-                orderTotal: order.orderTotal
+        if (!_doc) {
+          res.json({
+            status: 1,
+            msg: '购物车没有商品',
+            result: ''
+          })
+        } else {
+          // 计算购物车选择商品总价格
+          let subTotal = 0
+          let freight = 10
+          let discount = 200
+          _doc.cartList.forEach(item => {
+            if (item.checked === true) {
+              subTotal += item.salePrice * item.productNum
+            }
+          })
+          orderTotal = subTotal + freight - discount
+          User.findOne({userId: userId})
+            .exec((err, doc) => {
+              if (err) {
+                res.json({
+                  status: 1,
+                  msg: err.message,
+                  result: ''
+                })
+              } else {
+                let address = {}
+                let goodsList = []
+                let newCartList = []
+                // 获取当前订单的地址
+                doc.addressList.forEach(item => {
+                  if (item.addressId === addressId) {
+                    address = item
+                  }
+                })
+                // 获取用户购物车商品,删除购物车已购买的商品
+                newCartList = doc.cartList.filter(item => {
+                  if (item.checked) {
+                    goodsList.push(item)
+                    return false
+                  }
+                  return item
+                })
+                let prefix = 622
+                let r1 = Math.floor(Math.random() * 10)
+                let r2 = Math.floor(Math.random() * 10)
+                let sysDate = new Date().Format('yyyyMMddhhmmss')
+                let createDate = new Date().Format('yyyy-MM-dd hh:mm:ss')
+                let orderId = prefix + r1 + sysDate + r2 + ''
+                let order = {
+                  orderId: orderId,
+                  orderTotal: orderTotal,
+                  addressInfo: address,
+                  goodsList: goodsList,
+                  orderStatus: 1, // 为1时未付款
+                  createDate: createDate
+                }
+                doc.orderList.push(order)
+                // 替换购物车列表
+                doc.cartList = newCartList
+                doc.save((err1, doc1) => {
+                  if (err1) {
+                    res.json({
+                      status: 1,
+                      msg: err1.message,
+                      result: ''
+                    })
+                  } else {
+                    res.json({
+                      status: 0,
+                      msg: '操作成功',
+                      result: {
+                        orderId: order.orderId,
+                        orderTotal: order.orderTotal
+                      }
+                    })
+                  }
+                })
               }
             })
-          }
-        })
+        }
       }
     })
 })
